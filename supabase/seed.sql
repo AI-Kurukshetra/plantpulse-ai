@@ -1,0 +1,2 @@
+-- PlantPulse AI uses the application seed script at scripts/seedPlantPulse.mjs.
+-- Keep this file so `supabase db reset` can complete, then run `npm run seed`.

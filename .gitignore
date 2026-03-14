@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build
+.next
+out
+build
+
+# Environment and secrets (never commit)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug and logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Coverage
+coverage
+
+# Codex / agent guidance (do not push)
+AGENTS.md
+.agents/
+agents/
+
+# Supabase local / CLI (do not push)
+supabase/.temp
+supabase/.branches
+
+# IDE / editor (optional: remove .cursor if you want to share Cursor rules)
+.cursor/
+.vscode/
+
+# OS and editor backup
+*.swp
+*.swo
+*~
+Thumbs.db
