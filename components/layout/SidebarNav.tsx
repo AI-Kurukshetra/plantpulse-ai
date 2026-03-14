@@ -15,7 +15,6 @@ import {
   PlugZap,
   ReceiptText,
   Scale,
-  Settings,
   ShieldCheck,
   Smartphone,
   TestTubeDiagonal,
@@ -32,9 +31,7 @@ export interface NavItem {
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Admin: Settings,
   'Real-time Monitoring': Gauge,
-  Plants: Factory,
   'Equipment Health': Wrench,
   'Production Efficiency': Activity,
   'Predictive Maintenance': Wrench,

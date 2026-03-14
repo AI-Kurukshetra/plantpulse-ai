@@ -28,8 +28,6 @@ export const navigation = [
   { href: '/benchmark-comparison' as Route, label: 'Benchmark Comparison', roles: ['admin', 'plant_manager'] as UserRole[] },
   { href: '/waste-analytics' as Route, label: 'Waste Analytics', roles: ['admin', 'plant_manager'] as UserRole[] },
   { href: '/water-optimization' as Route, label: 'Water Optimization', roles: ['admin', 'plant_manager'] as UserRole[] },
-  // Core entities and admin
-  { href: '/plants' as Route, label: 'Plants', roles: ['admin', 'plant_manager'] as UserRole[] },
-  { href: '/admin' as Route, label: 'Admin', roles: ['admin'] as UserRole[] },
+  // Administration
   { href: '/users' as Route, label: 'Users', roles: ['admin'] as UserRole[] }
 ];

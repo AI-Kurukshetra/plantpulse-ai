@@ -14,9 +14,6 @@ export function LandingFooter() {
           <Link href="/dashboard" className="transition hover:text-white">
             Dashboard
           </Link>
-          <Link href="/auth/login" className="transition hover:text-white">
-            Login
-          </Link>
         </nav>
       </div>
     </footer>

@@ -2,6 +2,13 @@ import type { Session, User } from '@supabase/supabase-js';
 import type { AuthenticatedUser, UserRole } from '@/types';
 import { supabase } from '@/lib/supabaseClient';
 
+export class SignupRateLimitError extends Error {
+  constructor(message = 'Signup is temporarily rate limited. Retry in a few seconds or sign in if your account already exists.') {
+    super(message);
+    this.name = 'SignupRateLimitError';
+  }
+}
+
 async function syncSession(session: Session | null) {
   const response = await fetch('/api/auth/session', {
     method: session ? 'POST' : 'DELETE',
@@ -35,6 +42,11 @@ function readRole(user: User | null): UserRole | null {
   return role === 'admin' || role === 'plant_manager' || role === 'technician' ? role : null;
 }
 
+function isSignupRateLimitError(error: { message?: string } | null) {
+  const message = error?.message?.toLowerCase() ?? '';
+  return message.includes('rate limit') || message.includes('security purposes') || message.includes('too many requests');
+}
+
 export async function signUp(
   email: string,
   password: string,
@@ -60,6 +72,15 @@ export async function signUp(
   });
 
   if (error) {
+    if (isSignupRateLimitError(error)) {
+      // Best-effort bypass: if the account exists already, try to establish a session instead of failing hard.
+      const fallback = await client.auth.signInWithPassword({ email, password });
+      if (!fallback.error && fallback.data.session) {
+        await syncSession(fallback.data.session);
+        return fallback.data;
+      }
+      throw new SignupRateLimitError();
+    }
     throw error;
   }
 

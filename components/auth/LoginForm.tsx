@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { LoaderCircle, LogIn, UserPlus } from 'lucide-react';
+import { ArrowRight, LoaderCircle, LogIn, Sparkles, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { PasswordField } from '@/components/auth/PasswordField';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getPostAuthRedirectPath } from '@/lib/authRedirect';
 import { loginSchema, type LoginValues } from '@/lib/validation/auth';
@@ -70,9 +71,8 @@ export function LoginForm() {
             {...register('email')}
           />
 
-          <Input
+          <PasswordField
             id="password"
-            type="password"
             autoComplete="current-password"
             label="Password"
             placeholder="Enter your password"
@@ -95,27 +95,52 @@ export function LoginForm() {
             )}
           </Button>
 
-          {/* Signup CTA: visible card so new users can find account creation without hunting for a small link. */}
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                <UserPlus className="h-5 w-5 text-signal" aria-hidden />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-white">New to PlantPulse AI?</p>
-                <p className="mt-0.5 text-sm text-mist/70">
-                  Create an account to access dashboards, alerts, and sustainability analytics.
-                </p>
+          {/* Signup CTA is presented as a richer conversion panel so the create-account path feels intentional. */}
+          <div className="mt-6 overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(145deg,rgba(28,194,138,0.12),rgba(8,20,31,0.96)_34%,rgba(243,167,18,0.08))]">
+            <div className="border-b border-white/10 px-5 py-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-signal/25 bg-signal/10">
+                  <Sparkles className="h-5 w-5 text-signal" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs uppercase tracking-[0.28em] text-signal/80">New workspace</p>
+                  <p className="mt-1 text-lg font-semibold text-white">Set up a PlantPulse AI account</p>
+                  <p className="mt-1 text-sm text-mist/72">
+                    Start with live plant visibility, predictive maintenance context, and sustainability intelligence.
+                  </p>
+                </div>
               </div>
             </div>
-            <Link
-              href="/auth/signup"
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-signal/50 bg-signal/10 px-4 py-3 font-medium text-signal transition hover:bg-signal/20 hover:text-[#4ad7aa]"
-              aria-label="Go to sign up page"
-            >
-              <UserPlus className="h-4 w-4" />
-              Create an account
-            </Link>
+
+            <div className="grid gap-3 px-5 py-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.22em] text-mist/50">Monitoring</p>
+                <p className="mt-2 text-sm text-white">Centralized KPIs, equipment health, and alert visibility.</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.22em] text-mist/50">AI Insights</p>
+                <p className="mt-2 text-sm text-white">Actionable recommendations layered on live plant data.</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.22em] text-mist/50">Sustainability</p>
+                <p className="mt-2 text-sm text-white">Track energy, emissions, and efficiency from day one.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-sm text-mist/70">
+                <UserPlus className="h-4 w-4 text-signal" />
+                Technician and Plant Manager signup supported
+              </div>
+              <Link
+                href="/auth/signup"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-signal/45 bg-signal/12 px-5 py-3 font-medium text-signal transition hover:bg-signal/22 hover:text-[#4ad7aa]"
+                aria-label="Go to sign up page"
+              >
+                Create your account
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </form>
       </CardContent>

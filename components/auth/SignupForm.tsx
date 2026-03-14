@@ -8,17 +8,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { PasswordField } from '@/components/auth/PasswordField';
 import { Select } from '@/components/common/Select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getPostAuthRedirectPath } from '@/lib/authRedirect';
 import { signupSchema, type SignupValues } from '@/lib/validation/auth';
-import { signUp } from '@/services/authService';
+import { SignupRateLimitError, signUp } from '@/services/authService';
 import type { UserRole } from '@/types';
 
 export function SignupForm() {
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [rateLimitState, setRateLimitState] = useState<SignupValues | null>(null);
   const {
     register,
     handleSubmit,
@@ -34,9 +36,10 @@ export function SignupForm() {
     }
   });
 
-  const onSubmit = async (values: SignupValues) => {
+  const submitSignup = async (values: SignupValues) => {
     setPending(true);
     setMessage(null);
+    setRateLimitState(null);
 
     try {
       // Public signup is enabled for non-admin roles.
@@ -46,11 +49,16 @@ export function SignupForm() {
       router.refresh();
       return;
     } catch (error) {
+      if (error instanceof SignupRateLimitError) {
+        setRateLimitState(values);
+      }
       setMessage(error instanceof Error ? error.message : 'Unable to complete signup.');
     } finally {
       setPending(false);
     }
   };
+
+  const onSubmit = handleSubmit(submitSignup);
 
   return (
     <Card className="w-full border-white/12 bg-[#0b1622]/88">
@@ -62,7 +70,7 @@ export function SignupForm() {
         <CardDescription>Sign up to access dashboards, alerts, and sustainability analytics.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-5">
           <Input
             id="fullName"
             label="Full name"
@@ -89,18 +97,16 @@ export function SignupForm() {
             ]}
             {...register('role')}
           />
-          <Input
+          <PasswordField
             id="password"
-            type="password"
             autoComplete="new-password"
             label="Password"
             placeholder="Enter a password"
             error={errors.password?.message}
             {...register('password')}
           />
-          <Input
+          <PasswordField
             id="confirmPassword"
-            type="password"
             autoComplete="new-password"
             label="Confirm password"
             placeholder="Re-enter your password"
@@ -110,6 +116,33 @@ export function SignupForm() {
 
           {message ? (
             <p className="rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-mist/88">{message}</p>
+          ) : null}
+
+          {rateLimitState ? (
+            <div className="rounded-2xl border border-amber/30 bg-amber/10 p-4 text-sm text-mist/88">
+              <p className="font-medium text-white">Signup is being throttled by the email provider.</p>
+              <p className="mt-1 text-mist/78">
+                Retry in a few seconds, or continue to login if the account was already created.
+              </p>
+              {/* Rate-limit handling keeps users moving with retry and login fallback instead of a dead-end error. */}
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="justify-center"
+                  disabled={pending}
+                  onClick={() => void submitSignup(rateLimitState)}
+                >
+                  Retry signup
+                </Button>
+                <Link
+                  href="/auth/login"
+                  className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-medium text-white transition hover:bg-white/10"
+                >
+                  Continue to login
+                </Link>
+              </div>
+            </div>
           ) : null}
 
           <Button type="submit" fullWidth disabled={pending} className="inline-flex items-center justify-center gap-2">

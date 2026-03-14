@@ -43,13 +43,6 @@ export function HeroSection({ dashboardHref }: HeroSectionProps) {
               Explore Dashboard
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              href="/auth/login"
-              aria-label="Login to PlantPulse AI"
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 font-medium text-white transition hover:bg-white/10"
-            >
-              Login
-            </Link>
           </div>
 
           <div className="mt-10 grid gap-3 sm:grid-cols-3">

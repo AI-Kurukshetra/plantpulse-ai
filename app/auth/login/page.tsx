@@ -18,6 +18,7 @@ export default async function AuthLoginPage() {
 
   return (
     <AuthPageShell
+      mode="login"
       title="Smart plant intelligence for modern manufacturing teams."
       description="AI-powered manufacturing intelligence and sustainability monitoring platform."
       form={<LoginForm />}

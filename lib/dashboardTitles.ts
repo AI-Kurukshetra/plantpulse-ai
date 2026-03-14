@@ -86,14 +86,6 @@ export const dashboardTitles: Record<
     title: 'Water Optimization',
     subtitle: 'Water consumption and conservation.'
   },
-  '/plants': {
-    title: 'Plant Profile',
-    subtitle: 'Primary production site and expansion path.'
-  },
-  '/admin': {
-    title: 'Admin',
-    subtitle: 'System and user administration.'
-  },
   '/users': {
     title: 'Users',
     subtitle: 'User and role management.'

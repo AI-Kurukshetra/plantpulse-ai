@@ -13,7 +13,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ title, subtitle, role = 'plant_manager', fullWidth = true, children }: AppShellProps) {
-  // Role-filtered navigation: admin-only items (RBAC, Admin, Users) only visible to admin.
+  // Role-filtered navigation keeps admin-only destinations limited to authorized users.
   const allowedNavigation = navigation.filter((item) => item.roles.includes(role));
   const shellWidthClass = fullWidth ? 'max-w-none px-0' : 'max-w-7xl px-4 lg:px-8';
 

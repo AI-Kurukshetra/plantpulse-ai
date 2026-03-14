@@ -18,6 +18,7 @@ export default async function AuthSignupPage() {
 
   return (
     <AuthPageShell
+      mode="signup"
       title="Create access for your plant operations team."
       description="Use PlantPulse AI to centralize monitoring, predictive maintenance, and sustainability insights."
       form={<SignupForm />}

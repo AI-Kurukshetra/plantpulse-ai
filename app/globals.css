@@ -12,6 +12,8 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-color: rgba(155, 176, 193, 0.55) rgba(255, 255, 255, 0.06);
+  scrollbar-width: thin;
 }
 
 body {
@@ -22,6 +24,33 @@ body {
     linear-gradient(180deg, #07111a 0%, #10283c 55%, #08141f 100%);
   color: #f4f7fa;
   font-feature-settings: 'ss01' on, 'cv01' on;
+  overscroll-behavior-y: none;
+}
+
+/* Global scrollbar polish keeps long dashboards and auth pages visually consistent with the product theme. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 176, 193, 0.45) rgba(255, 255, 255, 0.04);
+}
+
+*::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(28, 194, 138, 0.5), rgba(138, 176, 248, 0.42));
+  border: 2px solid rgba(7, 17, 26, 0.92);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(28, 194, 138, 0.72), rgba(243, 167, 18, 0.5));
 }
 
 .grid-overlay {

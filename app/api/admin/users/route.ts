@@ -1,19 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { AUTH_ACCESS_TOKEN_COOKIE } from '@/lib/authCookies';
-import { getRoleFromToken } from '@/lib/authToken';
+import { decodeAuthToken, getRoleFromToken } from '@/lib/authToken';
 import { getSupabaseEnv } from '@/lib/env';
 import { createUserSchema } from '@/lib/validation/auth';
 
-function getAdminClient(request: Request) {
+function getAccessToken(request: Request) {
   const cookieHeader = request.headers.get('cookie') ?? '';
   const accessTokenMatch = cookieHeader.match(new RegExp(`${AUTH_ACCESS_TOKEN_COOKIE}=([^;]+)`));
-  const accessToken = accessTokenMatch?.[1] ?? null;
+  return accessTokenMatch?.[1] ? decodeURIComponent(accessTokenMatch[1]) : null;
+}
 
-  if (!accessToken || getRoleFromToken(decodeURIComponent(accessToken)) !== 'admin') {
+function getAdminClient(request: Request) {
+  const accessToken = getAccessToken(request);
+  const requesterId = accessToken ? decodeAuthToken(accessToken)?.sub ?? null : null;
+
+  if (!accessToken || getRoleFromToken(accessToken) !== 'admin') {
     return {
       error: NextResponse.json({ error: 'Admin access required.' }, { status: 403 }),
-      client: null
+      client: null,
+      requesterId: null
     };
   }
 
@@ -21,7 +27,8 @@ function getAdminClient(request: Request) {
   if (!env?.serviceRoleKey) {
     return {
       error: NextResponse.json({ error: 'Server-side Supabase service role key is not configured.' }, { status: 500 }),
-      client: null
+      client: null,
+      requesterId
     };
   }
 
@@ -32,11 +39,11 @@ function getAdminClient(request: Request) {
     }
   });
 
-  return { error: null, client };
+  return { error: null, client, requesterId };
 }
 
 export async function GET(request: Request) {
-  const { error, client } = getAdminClient(request);
+  const { error, client, requesterId } = getAdminClient(request);
   if (error || !client) {
     return error;
   }
@@ -71,6 +78,7 @@ export async function GET(request: Request) {
       role: row.role && typeof row.role === 'object' && 'name' in row.role ? row.role.name : 'technician',
       createdAt: row.created_at
     })),
+    currentUserId: requesterId,
     page,
     pageSize,
     total: count ?? 0
@@ -129,4 +137,30 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ ok: true, userId: created.user.id });
+}
+
+export async function DELETE(request: Request) {
+  const { error, client: adminClient, requesterId } = getAdminClient(request);
+  if (error || !adminClient) {
+    return error;
+  }
+
+  const url = new URL(request.url);
+  const userId = (url.searchParams.get('userId') ?? '').trim();
+
+  if (!userId) {
+    return NextResponse.json({ error: 'User id is required.' }, { status: 400 });
+  }
+
+  if (requesterId && requesterId === userId) {
+    return NextResponse.json({ error: 'You cannot delete the currently signed-in admin user.' }, { status: 400 });
+  }
+
+  const { error: deleteError } = await adminClient.auth.admin.deleteUser(userId);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 400 });
+  }
+
+  return NextResponse.json({ ok: true, userId });
 }

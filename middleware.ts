@@ -7,7 +7,6 @@ import { getRoleFromToken } from '@/lib/authToken';
 
 const protectedMatchers = [
   '/dashboard',
-  '/plants',
   '/equipment',
   '/analytics',
   '/alerts',
@@ -15,14 +14,11 @@ const protectedMatchers = [
   '/sustainability',
   '/integrations',
   '/rbac',
-  '/users',
-  '/admin'
+  '/users'
 ];
 
 const roleAccess: Record<string, UserRole[]> = {
-  '/admin': ['admin'],
   '/dashboard': ['admin', 'plant_manager', 'technician'],
-  '/plants': ['admin', 'plant_manager'],
   '/equipment': ['admin', 'plant_manager', 'technician'],
   '/analytics': ['admin', 'plant_manager'],
   '/alerts': ['admin', 'plant_manager', 'technician'],
@@ -80,7 +76,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/plants/:path*',
     '/equipment/:path*',
     '/analytics/:path*',
     '/alerts/:path*',
@@ -88,7 +83,6 @@ export const config = {
     '/sustainability/:path*',
     '/integrations/:path*',
     '/rbac/:path*',
-    '/users/:path*',
-    '/admin/:path*'
+    '/users/:path*'
   ]
 };
