@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { MaintenanceRecommendation, MaintenanceScheduleItem, MockMaintenanceScheduleItem } from '@/types';
 import { formatDateTime } from '@/utils/format';
 
@@ -13,29 +14,6 @@ interface PredictiveMaintenanceDashboardProps {
 }
 
 const PAGE_SIZE = 5;
-
-function getSeverityPillClass(severity: MaintenanceRecommendation['severity']) {
-  if (severity === 'critical') {
-    return 'bg-danger/20 text-danger';
-  }
-  if (severity === 'warning') {
-    return 'bg-amber-400/20 text-amber-200';
-  }
-  return 'bg-sky-400/20 text-sky-200';
-}
-
-function getStatusPillClass(status: MaintenanceScheduleItem['status']) {
-  if (status === 'overdue') {
-    return 'bg-danger/20 text-danger';
-  }
-  if (status === 'in_progress') {
-    return 'bg-signal/20 text-signal';
-  }
-  if (status === 'completed') {
-    return 'bg-emerald-400/20 text-emerald-200';
-  }
-  return 'bg-white/10 text-mist/80';
-}
 
 export function PredictiveMaintenanceDashboard({
   recommendations,
@@ -173,11 +151,7 @@ export function PredictiveMaintenanceDashboard({
                   <td className="px-4 py-3 font-medium text-white">{item.equipmentName}</td>
                   <td className="px-4 py-3">{item.reasons.join(' | ')}</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] ${getSeverityPillClass(item.severity)}`}
-                    >
-                      {item.severity}
-                    </span>
+                    <StateBadge value={item.severity} />
                   </td>
                 </tr>
               ))}
@@ -244,11 +218,7 @@ export function PredictiveMaintenanceDashboard({
                     </td>
                     <td className="px-4 py-3">{formatDateTime(item.scheduledFor)}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] ${getStatusPillClass(item.status)}`}
-                      >
-                        {item.status.replace('_', ' ')}
-                      </span>
+                      <StateBadge value={item.status} />
                     </td>
                   </tr>
                 ))}
@@ -308,11 +278,7 @@ export function PredictiveMaintenanceDashboard({
                     <td className="px-4 py-3">{formatDateTime(item.scheduledFor)}</td>
                     <td className="px-4 py-3 capitalize">{item.maintenanceType.replace('_', ' ')}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] ${getStatusPillClass(item.status)}`}
-                      >
-                        {item.status.replace('_', ' ')}
-                      </span>
+                      <StateBadge value={item.status} />
                     </td>
                   </tr>
                 ))}

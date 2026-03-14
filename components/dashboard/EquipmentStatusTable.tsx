@@ -4,14 +4,8 @@ import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { ModernSelect } from '@/components/common/ModernSelect';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { Equipment } from '@/types';
-
-const statusStyles: Record<Equipment['status'], string> = {
-  running: 'bg-signal/15 text-signal',
-  idle: 'bg-white/10 text-mist',
-  maintenance: 'bg-danger/15 text-danger',
-  offline: 'bg-white/10 text-mist'
-};
 
 interface EquipmentStatusTableProps {
   equipment: Equipment[];
@@ -126,9 +120,10 @@ export function EquipmentStatusTable({ equipment, showControls = false }: Equipm
                   <p className="text-xs text-mist/50">{asset.category}</p>
                 </td>
                 <td className="py-4">
-                  <span className={clsx('rounded-full px-3 py-1 text-xs capitalize', statusStyles[asset.status])}>
-                    {asset.status === 'maintenance' || asset.status === 'offline' ? 'fault' : asset.status}
-                  </span>
+                  <StateBadge
+                    value={asset.status}
+                    label={asset.status === 'maintenance' || asset.status === 'offline' ? 'fault' : undefined}
+                  />
                 </td>
                 <td className="py-4">{asset.temperature} C</td>
                 <td className="py-4">{asset.vibration} mm/s</td>

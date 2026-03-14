@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { EnergyUsageChart } from '@/components/charts/EnergyUsageChart';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { EnergyPoint, Equipment } from '@/types';
 import { formatCompactNumber } from '@/utils/format';
 
@@ -214,7 +215,9 @@ export function EnergyConsumptionAnalytics({
                   <td className="py-4">{item.category}</td>
                   <td className="py-4">{mapAreaFromCategory(item.category)}</td>
                   <td className="py-4">{item.energyKwh.toFixed(1)} kWh</td>
-                  <td className="py-4 capitalize">{item.status}</td>
+                  <td className="py-4">
+                    <StateBadge value={item.status} />
+                  </td>
                   <td className="py-4 text-xs text-signal">
                     {item.aiInsight?.recommendation ?? 'No active recommendation'}
                   </td>

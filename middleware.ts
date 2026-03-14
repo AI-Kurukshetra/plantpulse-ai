@@ -6,27 +6,53 @@ import { AUTH_ACCESS_TOKEN_COOKIE } from '@/lib/authCookies';
 import { getRoleFromToken } from '@/lib/authToken';
 
 const protectedMatchers = [
+  '/admin',
+  '/alert-management',
   '/dashboard',
-  '/equipment',
-  '/analytics',
   '/alerts',
-  '/maintenance',
-  '/sustainability',
+  '/analytics',
+  '/benchmark-comparison',
+  '/compliance',
+  '/cost-optimization',
+  '/data-exchange',
+  '/equipment',
+  '/fleet',
+  '/historical-analysis',
   '/integrations',
+  '/maintenance',
+  '/mobile-operations',
   '/rbac',
-  '/users'
+  '/report-builder',
+  '/resource-utilization',
+  '/sustainability',
+  '/users',
+  '/waste-analytics',
+  '/water-optimization'
 ];
 
 const roleAccess: Record<string, UserRole[]> = {
+  '/admin': ['admin'],
+  '/alert-management': ['admin', 'plant_manager', 'technician'],
+  '/alerts': ['admin', 'plant_manager', 'technician'],
+  '/analytics': ['admin', 'plant_manager'],
+  '/benchmark-comparison': ['admin', 'plant_manager'],
+  '/compliance': ['admin', 'plant_manager'],
+  '/cost-optimization': ['admin', 'plant_manager'],
+  '/data-exchange': ['admin', 'plant_manager'],
   '/dashboard': ['admin', 'plant_manager', 'technician'],
   '/equipment': ['admin', 'plant_manager', 'technician'],
-  '/analytics': ['admin', 'plant_manager'],
-  '/alerts': ['admin', 'plant_manager', 'technician'],
-  '/maintenance': ['admin', 'plant_manager', 'technician'],
-  '/sustainability': ['admin', 'plant_manager'],
+  '/fleet': ['admin', 'plant_manager'],
+  '/historical-analysis': ['admin', 'plant_manager'],
   '/integrations': ['admin', 'plant_manager'],
+  '/maintenance': ['admin', 'plant_manager', 'technician'],
+  '/mobile-operations': ['admin', 'plant_manager', 'technician'],
   '/rbac': ['admin'],
-  '/users': ['admin']
+  '/report-builder': ['admin', 'plant_manager'],
+  '/resource-utilization': ['admin', 'plant_manager'],
+  '/sustainability': ['admin', 'plant_manager'],
+  '/users': ['admin'],
+  '/waste-analytics': ['admin', 'plant_manager'],
+  '/water-optimization': ['admin', 'plant_manager']
 };
 
 export async function middleware(request: NextRequest) {
@@ -75,14 +101,27 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/equipment/:path*',
-    '/analytics/:path*',
+    '/admin/:path*',
+    '/alert-management/:path*',
     '/alerts/:path*',
-    '/maintenance/:path*',
-    '/sustainability/:path*',
+    '/analytics/:path*',
+    '/benchmark-comparison/:path*',
+    '/compliance/:path*',
+    '/cost-optimization/:path*',
+    '/dashboard/:path*',
+    '/data-exchange/:path*',
+    '/equipment/:path*',
+    '/fleet/:path*',
+    '/historical-analysis/:path*',
     '/integrations/:path*',
+    '/maintenance/:path*',
+    '/mobile-operations/:path*',
     '/rbac/:path*',
-    '/users/:path*'
+    '/report-builder/:path*',
+    '/resource-utilization/:path*',
+    '/sustainability/:path*',
+    '/users/:path*',
+    '/waste-analytics/:path*',
+    '/water-optimization/:path*'
   ]
 };

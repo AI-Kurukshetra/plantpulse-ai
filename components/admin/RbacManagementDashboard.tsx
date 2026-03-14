@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { RolePermissionMatrix, RolePermissionProfile, UserRole } from '@/types';
 
 interface RbacManagementDashboardProps {
@@ -101,8 +102,9 @@ export function RbacManagementDashboard({ currentRole, matrix, initialProfiles }
             <p className="mt-2 text-sm text-mist/75">{selectedProfile?.description}</p>
             <p className="mt-2 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-signal">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Applies to {selectedProfile?.appliesTo?.replace('_', ' ')}
+              Applies to
             </p>
+            {selectedProfile?.appliesTo ? <StateBadge value={selectedProfile.appliesTo} className="mt-3" /> : null}
           </article>
         </div>
       </section>

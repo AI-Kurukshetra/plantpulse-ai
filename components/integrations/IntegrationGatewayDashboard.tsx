@@ -13,17 +13,11 @@ import {
   YAxis
 } from 'recharts';
 import { Button } from '@/components/common/Button';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { IntegrationGatewayDashboardData } from '@/types';
 import { formatDateTime } from '@/utils/format';
 
 const PAGE_SIZE = 6;
-
-function statusClass(status: 'connected' | 'degraded' | 'offline' | 'planned') {
-  if (status === 'connected') return 'bg-emerald-400/20 text-emerald-200';
-  if (status === 'degraded') return 'bg-amber-400/20 text-amber-200';
-  if (status === 'offline') return 'bg-danger/20 text-danger';
-  return 'bg-sky-400/20 text-sky-200';
-}
 
 export function IntegrationGatewayDashboard({ data }: { data: IntegrationGatewayDashboardData }) {
   const [site, setSite] = useState<'all' | string>('all');
@@ -169,9 +163,7 @@ export function IntegrationGatewayDashboard({ data }: { data: IntegrationGateway
                   <td className="py-4 text-white">{item.systemName}</td>
                   <td className="py-4">{item.site}</td>
                   <td className="py-4">
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs uppercase ${statusClass(item.status)}`}>
-                      {item.status}
-                    </span>
+                    <StateBadge value={item.status} />
                   </td>
                   <td className="py-4">{item.latencyMs ? `${item.latencyMs} ms` : '-'}</td>
                   <td className="py-4">{item.syncSuccessRate ? `${item.syncSuccessRate.toFixed(1)}%` : '-'}</td>
@@ -237,9 +229,7 @@ export function IntegrationGatewayDashboard({ data }: { data: IntegrationGateway
                     <p className="font-medium text-white">
                       {item.systemName} ({item.systemType})
                     </p>
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs uppercase ${statusClass(item.status)}`}>
-                      {item.status}
-                    </span>
+                    <StateBadge value={item.status} className="shrink-0" />
                   </div>
                   <p className="mt-2 text-sm text-mist/75">{item.notes}</p>
                   <p className="mt-1 inline-flex items-center gap-2 text-xs text-signal">

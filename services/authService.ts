@@ -1,5 +1,6 @@
 import type { Session, User } from '@supabase/supabase-js';
 import type { AuthenticatedUser, UserRole } from '@/types';
+import { isDemoMode } from '@/lib/env';
 import { supabase } from '@/lib/supabaseClient';
 
 export class SignupRateLimitError extends Error {
@@ -7,6 +8,13 @@ export class SignupRateLimitError extends Error {
     super(message);
     this.name = 'SignupRateLimitError';
   }
+}
+
+export interface SignupResult {
+  requiresEmailVerification: boolean;
+  session: Session | null;
+  usedDemoBypass: boolean;
+  user: User | null;
 }
 
 async function syncSession(session: Session | null) {
@@ -47,6 +55,58 @@ function isSignupRateLimitError(error: { message?: string } | null) {
   return message.includes('rate limit') || message.includes('security purposes') || message.includes('too many requests');
 }
 
+function isExistingUserError(error: { message?: string } | null) {
+  const message = error?.message?.toLowerCase() ?? '';
+  return message.includes('already registered') || message.includes('already exists') || message.includes('already been registered');
+}
+
+async function runDemoSignupBypass(
+  email: string,
+  password: string,
+  role: UserRole,
+  options?: {
+    fullName?: string;
+  }
+) {
+  const response = await fetch('/api/auth/demo-signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      fullName: options?.fullName ?? '',
+      password,
+      role
+    })
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? 'Unable to provision the demo account.');
+  }
+}
+
+async function signInAfterBypass(
+  email: string,
+  password: string,
+  role: UserRole,
+  options?: {
+    fullName?: string;
+  }
+) {
+  // Demo mode skips confirmation/rate-limit blockers by ensuring a confirmed server-side user first.
+  await runDemoSignupBypass(email, password, role, options);
+  const data = await signIn(email, password);
+
+  return {
+    requiresEmailVerification: false,
+    session: data.session,
+    usedDemoBypass: true,
+    user: data.user
+  } satisfies SignupResult;
+}
+
 export async function signUp(
   email: string,
   password: string,
@@ -60,6 +120,7 @@ export async function signUp(
   }
 
   const client = requireSupabase();
+  const demoMode = isDemoMode();
   const { data, error } = await client.auth.signUp({
     email,
     password,
@@ -72,45 +133,50 @@ export async function signUp(
   });
 
   if (error) {
-    if (isSignupRateLimitError(error)) {
-      // Best-effort bypass: if the account exists already, try to establish a session instead of failing hard.
-      const fallback = await client.auth.signInWithPassword({ email, password });
-      if (!fallback.error && fallback.data.session) {
-        await syncSession(fallback.data.session);
-        return fallback.data;
+    if (demoMode && isExistingUserError(error)) {
+      try {
+        const signedIn = await signIn(email, password);
+        return {
+          requiresEmailVerification: false,
+          session: signedIn.session,
+          usedDemoBypass: true,
+          user: signedIn.user
+        } satisfies SignupResult;
+      } catch {
+        throw new Error('Account exists or verification skipped. Signing you in failed because the password was rejected.');
       }
+    }
+
+    if (demoMode && isSignupRateLimitError(error)) {
+      return signInAfterBypass(email, password, role, options);
+    }
+
+    if (isSignupRateLimitError(error)) {
       throw new SignupRateLimitError();
     }
     throw error;
   }
 
-  let activeSession = data.session;
-  if (!activeSession) {
-    const { data: sessionData } = await client.auth.getSession();
-    activeSession = sessionData.session ?? null;
-  }
-  if (!activeSession) {
-    const { data: signedInData, error: signedInError } = await client.auth.signInWithPassword({ email, password });
-    if (!signedInError && signedInData?.session) {
-      activeSession = signedInData.session;
-    } else if (signedInError) {
-      const msg = signedInError.message?.toLowerCase() ?? '';
-      if (msg.includes('confirm') || msg.includes('verified')) {
-        throw new Error('Please check your email to confirm your account, then sign in.');
-      }
-      await new Promise((r) => setTimeout(r, 800));
-      const retry = await client.auth.signInWithPassword({ email, password });
-      if (retry.error || !retry.data.session) {
-        throw new Error('Signup completed but no active session was created. Please sign in to continue.');
-      }
-      activeSession = retry.data.session;
-    } else {
-      throw new Error('Signup completed but no active session was created. Please sign in to continue.');
-    }
+  if (data.session) {
+    await syncSession(data.session);
+    return {
+      requiresEmailVerification: false,
+      session: data.session,
+      usedDemoBypass: false,
+      user: data.user
+    } satisfies SignupResult;
   }
 
-  await syncSession(activeSession);
-  return data;
+  if (demoMode) {
+    return signInAfterBypass(email, password, role, options);
+  }
+
+  return {
+    requiresEmailVerification: true,
+    session: null,
+    usedDemoBypass: false,
+    user: data.user
+  } satisfies SignupResult;
 }
 
 export async function signIn(email: string, password: string) {
@@ -134,13 +200,30 @@ export async function signIn(email: string, password: string) {
 
 export async function signOut() {
   const client = requireSupabase();
-  const { error } = await client.auth.signOut();
+  let sessionError: Error | null = null;
 
-  if (error) {
-    throw error;
+  try {
+    const { error } = await client.auth.signOut({ scope: 'local' });
+    if (error && !error.message.toLowerCase().includes('session')) {
+      sessionError = error;
+    }
+  } catch (error) {
+    sessionError = error instanceof Error ? error : new Error('Unable to sign out of the local session.');
   }
 
-  await syncSession(null);
+  try {
+    // Cookie cleanup still runs even when the local Supabase session is already stale.
+    await syncSession(null);
+  } catch (error) {
+    if (!sessionError) {
+      sessionError =
+        error instanceof Error ? error : new Error('Unable to clear the authenticated session cookies.');
+    }
+  }
+
+  if (sessionError) {
+    throw sessionError;
+  }
 }
 
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
