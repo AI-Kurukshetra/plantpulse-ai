@@ -3,15 +3,10 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { ArrowRight, X } from 'lucide-react';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { Alert } from '@/types';
 import { formatDateTime } from '@/utils/format';
 import { useEffect } from 'react';
-
-const severityStyles: Record<Alert['severity'], string> = {
-  critical: 'border-danger/30 bg-danger/10 text-danger',
-  warning: 'border-amber/30 bg-amber/10 text-amber',
-  info: 'border-white/10 bg-white/5 text-mist'
-};
 
 interface AlertsPanelProps {
   alerts: Alert[];
@@ -71,7 +66,7 @@ export function AlertsPanel({
             </article>
           ) : null}
           {visibleAlerts.map((alert) => (
-            <article key={alert.id} className={clsx('rounded-2xl border p-4', severityStyles[alert.severity])}>
+            <article key={alert.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className={clsx('font-medium text-white', compact && 'max-w-[14rem] truncate')} title={alert.title}>
@@ -89,7 +84,7 @@ export function AlertsPanel({
                   ) : null}
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <span className="whitespace-nowrap text-xs uppercase tracking-[0.3em]">{alert.severity}</span>
+                  <StateBadge value={alert.severity} className="whitespace-nowrap" />
                   {alert.generatedByAI ? (
                     <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-signal">
                       AI
@@ -122,8 +117,11 @@ export function AlertsPanel({
             </div>
             <div className="max-h-[70vh] space-y-3 overflow-y-auto pr-1">
               {alerts.map((alert) => (
-                <article key={alert.id} className={clsx('rounded-2xl border p-4', severityStyles[alert.severity])}>
-                  <p className="font-medium text-white">{alert.title}</p>
+                <article key={alert.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-medium text-white">{alert.title}</p>
+                    <StateBadge value={alert.severity} className="shrink-0" />
+                  </div>
                   <p className="mt-2 text-sm text-mist/75">{alert.description}</p>
                   {alert.aiSummary ? <p className="mt-2 text-sm text-signal">AI: {alert.aiSummary}</p> : null}
                   {alert.recommendedAction ? (

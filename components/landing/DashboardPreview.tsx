@@ -1,4 +1,5 @@
 import { Activity, AlertTriangle, Gauge, Leaf, Radar, Zap } from 'lucide-react';
+import { StateBadge } from '@/components/common/StateBadge';
 import { Card, CardContent } from '@/components/ui/card';
 
 const kpis = [
@@ -102,9 +103,7 @@ export function DashboardPreview() {
                   <div key={item} className="rounded-2xl border border-white/10 bg-[#0d1a28] p-3 text-sm text-mist/74">
                     <div className="flex items-center justify-between gap-3">
                       <span>{item}</span>
-                      <span className={index === 0 ? 'text-amber' : index === 1 ? 'text-danger' : 'text-signal'}>
-                        {index === 1 ? 'Critical' : index === 0 ? 'Warning' : 'Info'}
-                      </span>
+                      <StateBadge value={index === 1 ? 'critical' : index === 0 ? 'warning' : 'info'} />
                     </div>
                   </div>
                 ))}
@@ -132,7 +131,11 @@ export function DashboardPreview() {
                         style={{ width: asset.health }}
                       />
                     </div>
-                    <div className="mt-2 text-xs uppercase tracking-[0.24em] text-mist/50">{asset.status}</div>
+                    <StateBadge
+                      value={asset.status === 'Stable' ? 'running' : asset.status === 'Inspect' ? 'maintenance' : 'warning'}
+                      label={asset.status}
+                      className="mt-2"
+                    />
                   </div>
                 ))}
               </div>

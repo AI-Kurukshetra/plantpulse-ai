@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Search, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { StateBadge } from '@/components/common/StateBadge';
 import { CreateUserForm } from '@/components/admin/CreateUserForm';
 import type { UserAccessRecord } from '@/types';
 import { formatDateTime } from '@/utils/format';
@@ -203,7 +204,9 @@ export function UsersManagementClient() {
                     <tr key={user.id} className="border-b border-white/5 text-mist/80 last:border-none">
                       <td className="py-4 text-white">{user.email}</td>
                       <td className="py-4">{user.fullName ?? 'Unspecified'}</td>
-                      <td className="py-4 capitalize">{user.role.replace('_', ' ')}</td>
+                      <td className="py-4">
+                        <StateBadge value={user.role} />
+                      </td>
                       <td className="py-4">{formatDateTime(user.createdAt)}</td>
                       <td className="py-4 text-right">
                         <button

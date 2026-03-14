@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ArrowLeft, LogIn, UserPlus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { AppLogo } from '@/components/common/AppLogo';
 
 interface AuthPageShellProps {
@@ -28,13 +28,6 @@ export function AuthPageShell({ form, title, description, mode }: AuthPageShellP
             >
               <ArrowLeft className="h-4 w-4" />
               Back to landing
-            </Link>
-            <Link
-              href={mode === 'login' ? '/auth/signup' : '/auth/login'}
-              className="inline-flex items-center gap-2 rounded-full border border-signal/35 bg-signal/10 px-4 py-2 text-sm text-signal transition hover:bg-signal/18 hover:text-[#4ad7aa]"
-            >
-              {mode === 'login' ? <UserPlus className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
-              {mode === 'login' ? 'Create account' : 'Go to login'}
             </Link>
           </nav>
         </header>

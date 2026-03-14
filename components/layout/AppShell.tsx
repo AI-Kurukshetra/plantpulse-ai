@@ -24,9 +24,6 @@ export function AppShell({ title, subtitle, role = 'plant_manager', fullWidth = 
         <aside className="hidden w-72 shrink-0 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-panel backdrop-blur lg:sticky lg:top-4 lg:flex lg:h-[calc(100vh-2rem)] lg:flex-col lg:overflow-y-auto">
           <div className="shrink-0">
             <AppLogo />
-            <p className="mt-2 text-sm text-mist/70">
-              Smart plant intelligence for operations, equipment health, energy, and emissions oversight.
-            </p>
           </div>
           <SidebarNav items={allowedNavigation} />
         </aside>

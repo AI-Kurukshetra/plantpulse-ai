@@ -13,15 +13,10 @@ import {
   YAxis
 } from 'recharts';
 import { Button } from '@/components/common/Button';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { ImportantFeatureData } from '@/services/importantFeaturesService';
 
 const PAGE_SIZE = 8;
-
-function severityClass(severity: 'critical' | 'warning' | 'info' | undefined) {
-  if (severity === 'critical') return 'bg-danger/20 text-danger';
-  if (severity === 'warning') return 'bg-amber-400/20 text-amber-200';
-  return 'bg-sky-400/20 text-sky-200';
-}
 
 export function ImportantFeatureDashboard({
   data,
@@ -223,9 +218,7 @@ export function ImportantFeatureDashboard({
                     <div className="flex items-center gap-2">
                       <span>{row.kpi}</span>
                       {row.severity ? (
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] uppercase ${severityClass(row.severity)}`}>
-                          {row.severity}
-                        </span>
+                        <StateBadge value={row.severity} className="px-2 py-0.5 text-[10px]" />
                       ) : null}
                     </div>
                   </td>

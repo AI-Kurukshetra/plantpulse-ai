@@ -13,6 +13,7 @@ import {
   YAxis
 } from 'recharts';
 import { Button } from '@/components/common/Button';
+import { StateBadge } from '@/components/common/StateBadge';
 import type { AnomalyDetectionDashboardData, AnomalyDetectionRecord, AnomalyTrendPoint } from '@/types';
 
 type TimeRange = '24h' | '7d' | '30d';
@@ -22,12 +23,6 @@ type AnomalyPayload = {
   records: AnomalyDetectionRecord[];
   trend: AnomalyTrendPoint[];
   aiInsights: AnomalyDetectionDashboardData['aiInsights'];
-};
-
-const severityPillClass: Record<AnomalyDetectionRecord['severity'], string> = {
-  critical: 'bg-danger/20 text-danger',
-  warning: 'bg-amber-400/20 text-amber-200',
-  info: 'bg-sky-400/20 text-sky-200'
 };
 
 export function AnomalyDetectionDashboard({ initialData }: { initialData: AnomalyDetectionDashboardData }) {
@@ -261,9 +256,7 @@ export function AnomalyDetectionDashboard({ initialData }: { initialData: Anomal
                   <td className="py-4">{row.equipmentType}</td>
                   <td className="py-4">{row.anomalyScore.toFixed(1)}</td>
                   <td className="py-4">
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs uppercase ${severityPillClass[row.severity]}`}>
-                      {row.severity}
-                    </span>
+                    <StateBadge value={row.severity} />
                   </td>
                   <td className="max-w-sm py-4">{row.predictedImpact}</td>
                   <td className="max-w-sm py-4 text-signal">{row.recommendation}</td>
