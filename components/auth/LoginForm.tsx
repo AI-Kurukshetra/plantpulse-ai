@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { LoaderCircle, LogIn } from 'lucide-react';
+import { LoaderCircle, LogIn, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -94,12 +94,29 @@ export function LoginForm() {
               'Login'
             )}
           </Button>
-          <p className="text-center text-sm text-mist/70">
-            New to PlantPulse AI?{' '}
-            <Link href="/auth/signup" className="text-signal hover:text-[#4ad7aa]">
+
+          {/* Signup CTA: visible card so new users can find account creation without hunting for a small link. */}
+          <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                <UserPlus className="h-5 w-5 text-signal" aria-hidden />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-white">New to PlantPulse AI?</p>
+                <p className="mt-0.5 text-sm text-mist/70">
+                  Create an account to access dashboards, alerts, and sustainability analytics.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/auth/signup"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-signal/50 bg-signal/10 px-4 py-3 font-medium text-signal transition hover:bg-signal/20 hover:text-[#4ad7aa]"
+              aria-label="Go to sign up page"
+            >
+              <UserPlus className="h-4 w-4" />
               Create an account
             </Link>
-          </p>
+          </div>
         </form>
       </CardContent>
     </Card>

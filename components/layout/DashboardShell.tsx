@@ -1,26 +1,31 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
 import { AppLogo } from '@/components/common/AppLogo';
 import { navigation } from '@/lib/navigation';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { SidebarNav } from '@/components/layout/SidebarNav';
+import { getDashboardHeader } from '@/lib/dashboardTitles';
 import type { UserRole } from '@/types';
 
-interface AppShellProps {
-  title: string;
-  subtitle: string;
-  role?: UserRole;
-  fullWidth?: boolean;
+interface DashboardShellProps {
+  role: UserRole;
   children: React.ReactNode;
 }
 
-export function AppShell({ title, subtitle, role = 'plant_manager', fullWidth = true, children }: AppShellProps) {
-  // Role-filtered navigation: admin-only items (RBAC, Admin, Users) only visible to admin.
+/**
+ * Dashboard layout shell: sidebar + header always visible; only the content area (children) is
+ * replaced by loading.tsx when a segment is loading. Keeps nav and header stable during fetches.
+ */
+export function DashboardShell({ role, children }: DashboardShellProps) {
+  const pathname = usePathname();
+  const { title, subtitle } = getDashboardHeader(pathname);
   const allowedNavigation = navigation.filter((item) => item.roles.includes(role));
-  const shellWidthClass = fullWidth ? 'max-w-none px-0' : 'max-w-7xl px-4 lg:px-8';
 
   return (
     <div className="min-h-screen grid-overlay bg-plant-grid">
-      <div className={`mx-auto flex min-h-screen w-full gap-6 py-6 ${shellWidthClass}`}>
-        {/* Sticky sidebar: scrolls with content, overflow-y-auto so long menus don't break layout. */}
+      <div className="mx-auto flex min-h-screen w-full max-w-none gap-6 py-6 px-0">
+        {/* Sidebar stays visible during loading; only main content shows skeleton. */}
         <aside className="hidden w-72 shrink-0 rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-panel backdrop-blur lg:sticky lg:top-4 lg:flex lg:h-[calc(100vh-2rem)] lg:flex-col lg:overflow-y-auto">
           <div className="shrink-0">
             <AppLogo />
